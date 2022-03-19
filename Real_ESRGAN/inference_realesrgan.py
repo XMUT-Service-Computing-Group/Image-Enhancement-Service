@@ -13,7 +13,7 @@ from realesrgan.archs.srvgg_arch import SRVGGNetCompact
 from realesrgan.utils import RealESRGANer
 
 
-def enhancement(filepath, dirpath, ext):
+def enhancement(filepath, dirpath, ext, scale=4):
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input', type=str, default=filepath, help='输入图像')
     parser.add_argument(
@@ -84,7 +84,8 @@ def enhancement(filepath, dirpath, ext):
         from gfpgan import GFPGANer
         face_enhancer = GFPGANer(
             model_path='https://github.com/TencentARC/GFPGAN/releases/download/v0.2.0/GFPGANCleanv1-NoCE-C2.pth',
-            upscale=args.outscale,
+            # upscale=args.outscale,
+            upscale = scale,
             arch='clean',
             channel_multiplier=2,
             bg_upsampler=upsampler)
@@ -103,7 +104,7 @@ def enhancement(filepath, dirpath, ext):
             if args.face_enhance:
                 _, _, output = face_enhancer.enhance(img, has_aligned=False, only_center_face=False, paste_back=True)
             else:
-                output, _ = upsampler.enhance(img, outscale=args.outscale)
+                output, _ = upsampler.enhance(img, outscale=scale)
         except RuntimeError as error:
             # print('错误', error)
             # print('如果你遇到CUDA内存不足的情况，试着把--tile设置成一个较小的数字。')
