@@ -4,6 +4,7 @@ import sys
 
 import cv2
 import numpy as np
+from PIL import Image, ImageOps
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)) + "\\Real_ESRGAN")
 
@@ -95,34 +96,36 @@ def enhancement(filepath, dirpath, ext, scale=4):
         path = args.input
         imgname, extension = os.path.splitext(os.path.basename(path))
         #print(imgname)
-        print(extension)
-        img = cv2.imdecode(np.fromfile(path, dtype=np.uint8), -1)
-        if len(img.shape) == 3 and img.shape[2] == 4:
-            img_mode = 'RGBA'
-        else:
-            img_mode = None
+        #print(extension)
+    img = cv2.imdecode(np.fromfile(path, dtype=np.uint8), -1)
+    #img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+    if len(img.shape) == 3 and img.shape[2] == 4:
+        img_mode = 'RGBA'
+    else:
+        img_mode = None
 
-        try:
-            if args.face_enhance:
-                _, _, output = face_enhancer.enhance(img, has_aligned=False, only_center_face=False, paste_back=True)
-            else:
-                output, _ = upsampler.enhance(img, outscale=scale)
-        except RuntimeError as error:
-            # print('错误', error)
-            # print('如果你遇到CUDA内存不足的情况，试着把--tile设置成一个较小的数字。')
-            return "内存不足！"
+    try:
+        if args.face_enhance:
+            _, _, output = face_enhancer.enhance(img, has_aligned=False, only_center_face=False, paste_back=True)
         else:
-            if args.ext == 'auto':
-                extension = extension[1:]
-            else:
-                extension = args.ext[1]
-                #print(args.ext[1])
-            if img_mode == 'RGBA':  # RGBA images should be saved in png format
-                extension = '.png'
-            save_path = os.path.join(args.output, f'{imgname}_{args.suffix}{extension}')
-            print(save_path)
-            cv2.imwrite(save_path, output)
-            return "图片已增强！"
+            output, _ = upsampler.enhance(img, outscale=scale)
+    except RuntimeError as error:
+        # print('错误', error)
+        # print('如果你遇到CUDA内存不足的情况，试着把--tile设置成一个较小的数字。')
+        return "内存不足！"
+    else:
+        if args.ext == 'auto':
+            extension = extension[1:]
+            #print("test: ", extension)
+        else:
+            extension = args.ext
+            #print("test2: ", extension)
+        if img_mode == 'RGBA':  # RGBA images should be saved in png format
+            extension = '.png'
+        save_path = os.path.join(args.output, f'{imgname}_{args.suffix}{extension}')
+        print(save_path)
+        cv2.imwrite(save_path, output)
+        return "图片已增强！"
 
 
 if __name__ == '__main__':

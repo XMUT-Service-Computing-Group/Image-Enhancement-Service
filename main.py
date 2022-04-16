@@ -20,9 +20,10 @@ def GUI():
     
     def set_path_2(path1):
         dirname = os.path.dirname(path1)
-        ext = os.path.splitext(path1)
+        ext = os.path.splitext(path1)[1]
         #basename = os.path.basename(path1)
         #print(dirname)
+        #print(ext)
         return dirname, ext
         
     
@@ -61,6 +62,9 @@ def savefiles(path):
 
 
 def enhance(path1, path2, ext, entry_enhance_scale, button):
+    #print(path1)
+    #print(path2)
+    #print(ext)
     if not Path(path2).is_dir():
         os.makedirs(path2)
     if not Path(path1).is_file():
@@ -87,14 +91,16 @@ class enhanceThread(threading.Thread):
     def __init__(self, path1, path2, ext, scale, button):
         threading.Thread.__init__(self)
         self.path1 = path1
-        #base = os.path.basename(path1)
-        #basename = os.path.splitext(base)[0]
         self.path2 = path2 + '/'
         self.ext = ext
         self.scale = scale
         self.button = button
 
     def run(self):
+        #print(self.path1)
+        #print(self.path2)
+        #print(self.ext)
+        #print(self.scale)
         message = enhancement(self.path1, self.path2, self.ext, float(self.scale))
         self.button['text'] = "开始增强"
         self.button.place(x=70, y=100)
