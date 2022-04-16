@@ -94,6 +94,8 @@ def enhancement(filepath, dirpath, ext, scale=4):
     if os.path.isfile(args.input):
         path = args.input
         imgname, extension = os.path.splitext(os.path.basename(path))
+        #print(imgname)
+        print(extension)
         img = cv2.imdecode(np.fromfile(path, dtype=np.uint8), -1)
         if len(img.shape) == 3 and img.shape[2] == 4:
             img_mode = 'RGBA'
@@ -113,10 +115,12 @@ def enhancement(filepath, dirpath, ext, scale=4):
             if args.ext == 'auto':
                 extension = extension[1:]
             else:
-                extension = args.ext
+                extension = args.ext[1]
+                #print(args.ext[1])
             if img_mode == 'RGBA':  # RGBA images should be saved in png format
-                extension = 'png'
-            save_path = os.path.join(args.output, f'{imgname}_{args.suffix}.{extension}')
+                extension = '.png'
+            save_path = os.path.join(args.output, f'{imgname}_{args.suffix}{extension}')
+            print(save_path)
             cv2.imwrite(save_path, output)
             return "图片已增强！"
 

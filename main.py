@@ -20,9 +20,10 @@ def GUI():
     
     def set_path_2(path1):
         dirname = os.path.dirname(path1)
+        ext = os.path.splitext(path1)
         #basename = os.path.basename(path1)
         #print(dirname)
-        return dirname
+        return dirname, ext
         
     
     label1 = tk.Label(window, text="输入图像：")
@@ -39,10 +40,10 @@ def GUI():
     
     entry_enhance_scale = tk.Entry(window, width=6)
     entry_enhance_scale.place(x=110, y=60)
-    entry_enhance_scale.insert(0, 4)
+    entry_enhance_scale.insert(0, 2)
     
     button_enhance = tk.Button(window, text='开始增强', 
-                               command=lambda: enhance(path1.get(), set_path_2(path1.get()), 
+                               command=lambda: enhance(path1.get(), set_path_2(path1.get())[0], set_path_2(path1.get())[1],
                                                        entry_enhance_scale.get(), button_enhance))
     button_enhance.place(x=70, y=100)
 
@@ -59,7 +60,7 @@ def savefiles(path):
     path.insert(0, tkf.askdirectory())
 
 
-def enhance(path1, path2, entry_enhance_scale, button):
+def enhance(path1, path2, ext, entry_enhance_scale, button):
     if not Path(path2).is_dir():
         os.makedirs(path2)
     if not Path(path1).is_file():
@@ -78,22 +79,23 @@ def enhance(path1, path2, entry_enhance_scale, button):
         tk.messagebox.showerror('错误', "参数不能为空！")
         return
     
-    enhanceThread(path1, path2, entry_enhance_scale, button).start()
+    enhanceThread(path1, path2, ext, entry_enhance_scale, button).start()
     InfoThreadEnhance(button).start()
 
 class enhanceThread(threading.Thread):
 
-    def __init__(self, path1, path2, scale, button):
+    def __init__(self, path1, path2, ext, scale, button):
         threading.Thread.__init__(self)
         self.path1 = path1
         #base = os.path.basename(path1)
         #basename = os.path.splitext(base)[0]
         self.path2 = path2 + '/'
+        self.ext = ext
         self.scale = scale
         self.button = button
 
     def run(self):
-        message = enhancement(self.path1, self.path2, float(self.scale))
+        message = enhancement(self.path1, self.path2, self.ext, float(self.scale))
         self.button['text'] = "开始增强"
         self.button.place(x=70, y=100)
         tk.messagebox.showinfo('信息', message)
