@@ -4,7 +4,7 @@ import sys
 
 import cv2
 import numpy as np
-from PIL import Image, ImageOps
+# from PIL import Image, ImageOps
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)) + "\\Real_ESRGAN")
 
@@ -110,8 +110,8 @@ def enhancement(filepath, dirpath, ext, scale=4):
         else:
             output, _ = upsampler.enhance(img, outscale=scale)
     except RuntimeError as error:
-        # print('错误', error)
-        # print('如果你遇到CUDA内存不足的情况，试着把--tile设置成一个较小的数字。')
+        print('错误', error)
+        print('如果你遇到CUDA内存不足的情况，试着把--tile设置成一个较小的数字。')
         return "内存不足！"
     else:
         if args.ext == 'auto':
@@ -124,7 +124,8 @@ def enhancement(filepath, dirpath, ext, scale=4):
             extension = '.png'
         save_path = os.path.join(args.output, f'{imgname}_{args.suffix}{extension}')
         print(save_path)
-        cv2.imwrite(save_path, output)
+        #cv2.imwrite(save_path, output)
+        cv2.imencode(extension, output)[1].tofile(save_path) # 中文路径
         return "图片已增强！"
 
 
